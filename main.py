@@ -4,6 +4,7 @@
 # TODO(gkm): We are currently reading the stream twice, we can instead
 # read through the stream once assuming "success" is the first thing
 # in the stream.
+# TODO(gkm): Database file should be in an envionment variable or command line argument.
 
 import sqlite3
 import math
@@ -11,10 +12,13 @@ import sys
 from tempfile import TemporaryFile
 from contextlib import closing
 from datetime import datetime, timedelta, timezone
+from pathlib import Path
 
 import ijson
 import httpx
 
+
+SCRIPT_DIR = Path(__file__).parent
 
 def merge_user(user):
     u = user
@@ -76,10 +80,10 @@ def skip_data(events):
             yield event
 
 def main():
-    with open("init.sql", "r") as f:
+    with open(SCRIPT_DIR / "init.sql", "r") as f:
         script = f.read()
 
-    with closing(sqlite3.connect("data.db")) as con, con:
+    with closing(sqlite3.connect(SCRIPT_DIR / "data.db")) as con, con:
         with closing(con.cursor()) as cur, con:
             cur.executescript(script)
 
